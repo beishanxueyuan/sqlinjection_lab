@@ -116,7 +116,7 @@ def execute_query(get_conn_func, query_template, params_dict, db_type_name):
             # 注意：实际应用应该使用参数化查询！
             query = query_template.format(**params_dict) 
             
-            if db_type_name.lower() in ['mysql', 'postgres', 'oracle']:
+            if db_type_name.lower() in ['mysql', 'postgres', 'postgresql', 'oracle']:
                  cursor = conn.cursor()
                  cursor.execute(query)
                  result = cursor.fetchall()
@@ -217,7 +217,7 @@ def postgres_char():
     
     success, data, status_code = execute_query(
         db.get_postgres_connection,
-        "SELECT * FROM users WHERE username = '{uid}'", # Intentionally vulnerable - using username for char example
+        "SELECT * FROM users WHERE id = '{uid}'", # Intentionally vulnerable - using username for char example
         {'uid': uid}, # Note: uid used in template as username value
         "PostgreSQL"
     )
@@ -279,14 +279,14 @@ def clickhouse_int():
 
 @app.route('/clickhouse/char', methods=['GET', 'POST'])
 def clickhouse_char():
-     # Using 'username' param as per table structure implied
-    name = get_input('username')
-    if not name: return jsonify({"error": "Missing username parameter"}), 400
+     # Using 'id' param as per table structure implied
+    uid = get_input('id')
+    if not uid: return jsonify({"error": "Missing id parameter"}), 400
     
     success, data, status_code = execute_query(
         db.get_clickhouse_connection,
-        "SELECT * FROM sqli_lab.users WHERE username = '{name}'", # Intentionally vulnerable
-        {'name': name},
+        "SELECT * FROM sqli_lab.users WHERE id = '{uid}'", # Intentionally vulnerable
+        {'uid': uid},
         "ClickHouse"
     )
     return jsonify(data), status_code
@@ -321,13 +321,13 @@ def clickhouse_orderby():
 
 @app.route('/oracle/char', methods=['GET', 'POST'])
 def oracle_char():
-    name = get_input('username')
-    if not name: return jsonify({"error": "Missing username parameter"}), 400
+    uid = get_input('id')
+    if not uid: return jsonify({"error": "Missing id parameter"}), 400
     
     success, data, status_code = execute_query(
         db.get_oracle_connection,
-        "SELECT * FROM users WHERE username = '{name}'", # Intentionally vulnerable
-        {'name': name},
+        "SELECT * FROM users WHERE id = '{uid}'", # Intentionally vulnerable
+        {'uid': uid},
         "Oracle"
     )
     return jsonify(data), status_code
@@ -506,13 +506,13 @@ def index():
             <td><code>/postgres/char</code></td>
             <td>id</td>
             <td>
-                <button class="btn btn-run" onclick="runTest('/postgres/char', 'id', 'admin', 'json')">JSON</button>
-                <button class="btn" onclick="runTest('/postgres/char', 'id', 'admin', 'form')">表单</button>
-                <button class="btn btn-alt" onclick="runUrlEncodedTest('/postgres/char', 'username', 'admin')">URL编码</button>
-                <button class="btn" style="background: #f39c12;" onclick="runNestedJsonStringTest('/postgres/char', 'username', 'admin')">嵌套JSON字符串</button>
-                <button class="btn" style="background: #27ae60;" onclick="runNestedJsonObjectTest('/postgres/char', 'username', 'admin')">嵌套JSON对象</button>
-                <button class="btn" style="background: #e74c3c;" onclick="runGetTest('/postgres/char', 'id', 'admin')">GET请求</button>
-                <button class="btn" style="background: #16a085;" onclick="runGetUrlEncodedTest('/postgres/char', 'id', 'admin')">GET URL编码</button>
+                <button class="btn btn-run" onclick="runTest('/postgres/char', 'id', '1', 'json')">JSON</button>
+                <button class="btn" onclick="runTest('/postgres/char', 'id', '1', 'form')">表单</button>
+                <button class="btn btn-alt" onclick="runUrlEncodedTest('/postgres/char', 'id', '1')">URL编码</button>
+                <button class="btn" style="background: #f39c12;" onclick="runNestedJsonStringTest('/postgres/char', 'id', '1')">嵌套JSON字符串</button>
+                <button class="btn" style="background: #27ae60;" onclick="runNestedJsonObjectTest('/postgres/char', 'id', '1')">嵌套JSON对象</button>
+                <button class="btn" style="background: #e74c3c;" onclick="runGetTest('/postgres/char', 'id', '1')">GET请求</button>
+                <button class="btn" style="background: #16a085;" onclick="runGetUrlEncodedTest('/postgres/char', 'id', '1')">GET URL编码</button>
             </td>
         </tr>
         <tr>
@@ -566,15 +566,15 @@ def index():
         <tr>
             <td>字符串</td>
             <td><code>/clickhouse/char</code></td>
-            <td>username</td>
+            <td>id</td>
             <td>
-                <button class="btn btn-run" onclick="runTest('/clickhouse/char', 'username', 'admin', 'json')">JSON</button>
-                <button class="btn" onclick="runTest('/clickhouse/char', 'username', 'admin', 'form')">表单</button>
-                <button class="btn btn-alt" onclick="runUrlEncodedTest('/clickhouse/char', 'username', 'admin')">URL编码</button>
-                <button class="btn" style="background: #f39c12;" onclick="runNestedJsonStringTest('/clickhouse/char', 'username', 'admin')">嵌套JSON字符串</button>
-                <button class="btn" style="background: #27ae60;" onclick="runNestedJsonObjectTest('/clickhouse/char', 'username', 'admin')">嵌套JSON对象</button>
-                <button class="btn" style="background: #e74c3c;" onclick="runGetTest('/clickhouse/char', 'username', 'admin')">GET请求</button>
-                <button class="btn" style="background: #16a085;" onclick="runGetUrlEncodedTest('/clickhouse/char', 'username', 'admin')">GET URL编码</button>
+                <button class="btn btn-run" onclick="runTest('/clickhouse/char', 'id', '1', 'json')">JSON</button>
+                <button class="btn" onclick="runTest('/clickhouse/char', 'id', '1', 'form')">表单</button>
+                <button class="btn btn-alt" onclick="runUrlEncodedTest('/clickhouse/char', 'id', '1')">URL编码</button>
+                <button class="btn" style="background: #f39c12;" onclick="runNestedJsonStringTest('/clickhouse/char', 'id', '1')">嵌套JSON字符串</button>
+                <button class="btn" style="background: #27ae60;" onclick="runNestedJsonObjectTest('/clickhouse/char', 'id', '1')">嵌套JSON对象</button>
+                <button class="btn" style="background: #e74c3c;" onclick="runGetTest('/clickhouse/char', 'id', '1')">GET请求</button>
+                <button class="btn" style="background: #16a085;" onclick="runGetUrlEncodedTest('/clickhouse/char', 'id', '1')">GET URL编码</button>
             </td>
         </tr>
         <tr>
@@ -628,15 +628,15 @@ def index():
         <tr>
             <td>字符串</td>
             <td><code>/oracle/char</code></td>
-            <td>username</td>
+            <td>id</td>
             <td>
-                <button class="btn btn-run" onclick="runTest('/oracle/char', 'username', 'admin', 'json')">JSON</button>
-                <button class="btn" onclick="runTest('/oracle/char', 'username', 'admin', 'form')">表单</button>
-                <button class="btn btn-alt" onclick="runUrlEncodedTest('/oracle/char', 'username', 'admin')">URL编码</button>
-                <button class="btn" style="background: #f39c12;" onclick="runNestedJsonStringTest('/oracle/char', 'username', 'admin')">嵌套JSON字符串</button>
-                <button class="btn" style="background: #27ae60;" onclick="runNestedJsonObjectTest('/oracle/char', 'username', 'admin')">嵌套JSON对象</button>
-                <button class="btn" style="background: #e74c3c;" onclick="runGetTest('/oracle/char', 'username', 'admin')">GET请求</button>
-                <button class="btn" style="background: #16a085;" onclick="runGetUrlEncodedTest('/oracle/char', 'username', 'admin')">GET URL编码</button>
+                <button class="btn btn-run" onclick="runTest('/oracle/char', 'id', '1', 'json')">JSON</button>
+                <button class="btn" onclick="runTest('/oracle/char', 'id', '1', 'form')">表单</button>
+                <button class="btn btn-alt" onclick="runUrlEncodedTest('/oracle/char', 'id', '1')">URL编码</button>
+                <button class="btn" style="background: #f39c12;" onclick="runNestedJsonStringTest('/oracle/char', 'id', '1')">嵌套JSON字符串</button>
+                <button class="btn" style="background: #27ae60;" onclick="runNestedJsonObjectTest('/oracle/char', 'id', '1')">嵌套JSON对象</button>
+                <button class="btn" style="background: #e74c3c;" onclick="runGetTest('/oracle/char', 'id', '1')">GET请求</button>
+                <button class="btn" style="background: #16a085;" onclick="runGetUrlEncodedTest('/oracle/char', 'id', '1')">GET URL编码</button>
             </td>
         </tr>
         <tr>
