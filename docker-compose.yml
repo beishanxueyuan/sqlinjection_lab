@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  webapp:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+      - postgres
+      - clickhouse
+      - oracle
+    environment:
+      - MYSQL_HOST=mysql
+      - POSTGRES_HOST=postgres
+      - CLICKHOUSE_HOST=clickhouse
+      - ORACLE_HOST=oracle # --- Add or Modify these ClickHouse specific vars ---
+      - CLICKHOUSE_PORT=9000
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD= # Explicitly set to empty string
+      - CLICKHOUSE_DATABASE=sqli_lab
+      # -----------------------------------------------------
+    networks:
+      - sql-lab-net
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: sqli_lab
+    ports:
+      - "3306:3306"
+    networks:
+      - sql-lab-net
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: sqli_lab
+    ports:
+      - "5432:5432"
+    networks:
+      - sql-lab-net
+
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    # --- Add environment variable to explicitly set no password ---
+    environment:
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1 # Optional: enables managing access via SQL
+      # IMPORTANT: Setting password to empty string explicitly
+      - CLICKHOUSE_DEFAULT_USER=default
+      - CLICKHOUSE_DEFAULT_PASSWORD=
+    # ----------------------------------------------------------------
+    networks:
+      - sql-lab-net
+
+  oracle:
+    image: gvenzl/oracle-free:23-slim-faststart
+    environment:
+      ORACLE_PASSWORD: rootpassword
+      APP_USER: sqli_user
+      APP_USER_PASSWORD: sqli_password
+    ports:
+      - "1521:1521"
+    networks:
+      - sql-lab-net
+
+networks:
+  sql-lab-net:
+    driver: bridge

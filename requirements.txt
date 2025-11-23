@@ -1,0 +1,6 @@
+flask
+mysql-connector-python
+psycopg2-binary
+clickhouse-driver
+oracledb
+cryptography
