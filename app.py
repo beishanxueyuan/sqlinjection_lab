@@ -97,24 +97,20 @@ def execute_query(get_conn_func, query_template, params_dict, db_type_name):
     Returns:
         Tuple (success: bool, response_data: dict, status_code: int)
     """
-    # 模拟数据 - 即使数据库连接失败，也能返回测试数据
-    mock_result = [[1, "admin", "admin123"], [2, "user1", "pass1"]]
-    
     # 尝试获取连接
     try:
         conn = get_conn_func()
         if conn is None:
-            error_msg = f"无法连接到 {db_type_name} 数据库，使用模拟数据"
-            print(error_msg) # 服务器端日志
-            # 返回模拟数据而不是错误
-            query = query_template.format(**params_dict) 
-            return True, {"query": query, "result": mock_result, "note": "使用模拟数据"}, 200
+            error_msg = f"无法连接到 {db_type_name} 数据库"
+            print(error_msg)
+            query = query_template.format(**params_dict)
+            return False, {"query": query, "error": error_msg}, 500
 
         cursor = None
         try:
             # 格式化查询（假设故意存在漏洞用于实验）
             # 注意：实际应用应该使用参数化查询！
-            query = query_template.format(**params_dict) 
+            query = query_template.format(**params_dict)
             
             if db_type_name.lower() in ['mysql', 'postgres', 'postgresql', 'oracle']:
                  cursor = conn.cursor()
@@ -130,17 +126,16 @@ def execute_query(get_conn_func, query_template, params_dict, db_type_name):
 
         except Exception as e:
             error_msg = f"数据库查询失败: {str(e)}"
-            print(f"{db_type_name} 错误: {error_msg}") # 服务器端日志
-            # 出错时返回模拟数据，确保前端能看到响应
+            print(f"{db_type_name} 错误: {error_msg}")
             query = query_template.format(**params_dict)
-            return True, {"query": query, "result": mock_result, "error": error_msg, "note": "使用模拟数据"}, 200
+            return False, {"query": query, "error": error_msg}, 500
         finally:
             # 关闭资源
             if cursor:
                 try:
                     cursor.close()
                 except:
-                    pass # 忽略关闭cursor的错误
+                    pass
             if conn:
                 try:
                     if hasattr(conn, 'close'):
@@ -151,7 +146,7 @@ def execute_query(get_conn_func, query_template, params_dict, db_type_name):
         # 捕获所有异常，确保应用不会崩溃
         print(f"查询过程中发生异常: {e}")
         query = query_template.format(**params_dict)
-        return True, {"query": query, "result": mock_result, "error": str(e), "note": "使用模拟数据"}, 200
+        return False, {"query": query, "error": str(e)}, 500
 
 
 # --- MySQL Endpoints ---
