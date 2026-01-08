@@ -1,0 +1,33 @@
+{
+  "name": "SQL注入实验室",
+  "description": "SQL注入测试实验室 - 支持MySQL、PostgreSQL、ClickHouse",
+  "image": "Dockerfile",
+  "ports": [
+    {
+      "containerPort": 8888,
+      "protocol": "http"
+    }
+  ],
+  "env": [
+    {
+      "key": "MYSQL_HOST",
+      "value": "localhost"
+    },
+    {
+      "key": "POSTGRES_HOST", 
+      "value": "localhost"
+    },
+    {
+      "key": "CLICKHOUSE_HOST",
+      "value": "localhost"
+    }
+  ],
+  "healthCheck": {
+    "http": {
+      "path": "/",
+      "port": 8888,
+      "initialDelay": 60,
+      "interval": 30
+    }
+  }
+}
