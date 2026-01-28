@@ -16,7 +16,7 @@ docker run -p 8888:8888 -p 3306:3306 -p 5432:5432 -p 8123:8123 -p 9000:9000 sqli
 
 或者使用一次性命令构建并运行：
 ```bash
-docker build -f Dockerfile-single -t sqlinjection-lab . && docker run -p 8888:8888 -p 3306:3306 -p 5432:5432 -p 8123:8123 -p 9000:9000 sqlinjection-lab
+docker build -f Dockerfile -t sqlinjection-lab . && docker run -p 8888:8888 -p 3306:3306 -p 5432:5432 -p 8123:8123 -p 9000:9000 sqlinjection-lab
 ```
 
 ## 访问服务
