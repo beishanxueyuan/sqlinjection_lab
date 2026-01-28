@@ -6,7 +6,7 @@
 
 ### 使用Docker构建镜像：
 ```bash
-docker build -f Dockerfile-single -t sqlinjection-lab .
+docker build -f Dockerfile -t sqlinjection-lab .
 ```
 
 ### 运行容器：
